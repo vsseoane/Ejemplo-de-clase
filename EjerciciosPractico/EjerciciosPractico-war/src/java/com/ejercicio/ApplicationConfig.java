@@ -19,7 +19,7 @@ public class ApplicationConfig extends Application {
     }
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(com.ejercicio.author.AuthorController.class);
-        resources.add(com.ejercicio.author.BookController.class);
+        resources.add(com.ejercicio.book.BookController.class);
     }
     
 }

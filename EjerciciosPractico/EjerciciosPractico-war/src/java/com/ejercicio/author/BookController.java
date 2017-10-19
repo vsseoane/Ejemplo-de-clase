@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.ejercicio.author;
+package com.ejercicio.book;
 
+import com.ejercicio.book.Book;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
@@ -22,6 +23,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
+import javax.ejb.EJB;
 
 @Path("book")
 public class BookController {
@@ -29,16 +31,19 @@ public class BookController {
 
     @Context
     private UriInfo context;
+    
+    @EJB
+    private BookBean bookBean;
 
     public BookController() {
     }
 
-   /* @GET
+   @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAuthors() {
-        final Author author = authorBean.GetAuthor();
+    public Response getBooks() {
+        final Book book = bookBean.GetBook();
         final Gson gson = new Gson();
-        final String JSONRepresentation = gson.toJson(author);
+        final String JSONRepresentation = gson.toJson(book);
         return Response.status(Response.Status.OK).entity(JSONRepresentation).build();
     }
 
@@ -47,8 +52,8 @@ public class BookController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getBook(@PathParam("id") String id) {
         try {
-            int authorId = Integer.parseInt(id);
-            return Response.status(Response.Status.OK).entity("GetAuthor").build(); 
+            int bookId = Integer.parseInt(id);
+            return Response.status(Response.Status.OK).entity("GetBook").build(); 
         } catch (NumberFormatException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("El parámetro debe ser un int").build();
         }
@@ -57,48 +62,38 @@ public class BookController {
     @PUT
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response putAuthor(@PathParam("id") String id) {
+    public Response putBook(@PathParam("id") String id) {
         try {
-            int authorId = Integer.parseInt(id);
-            return Response.status(Response.Status.OK).entity("PutAuthor").build(); 
+            int bookId = Integer.parseInt(id);
+            return Response.status(Response.Status.OK).entity("PutBook").build(); 
         } catch (NumberFormatException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("El parámetro debe ser un int").build();
         }  
     }
     
     @POST
-    @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postAuthor(@PathParam("id") String id) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response postBook(String json) {
         try {
-            int authorId = Integer.parseInt(id);
-            return Response.status(Response.Status.OK).entity("PostAuthor").build(); 
+            Gson gson = new Gson();
+            Book book = gson.fromJson(json, Book.class);
+            bookBean.createBook(book);
+            return Response.status(Response.Status.OK).entity(book).build(); 
         } catch (NumberFormatException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("El parámetro debe ser un int").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("El libro no pudo ser creado").build();
         }     
     }
     
     @DELETE
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteAuthor(@PathParam("id") String id) {
+    public Response deleteBook(@PathParam("id") String id) {
         try {
-            int authorId = Integer.parseInt(id);
-            return Response.status(Response.Status.OK).entity("DeleteAuthor").build(); 
+            int bookId = Integer.parseInt(id);
+            return Response.status(Response.Status.OK).entity("DeleteBook").build(); 
         } catch (NumberFormatException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("El parámetro debe ser un int").build();
         }    
     }
-    
-    @GET
-    @Path("{id}/book")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAuthorBooks(@PathParam("id") String id) {
-        try {
-            int authorId = Integer.parseInt(id);
-            return Response.status(Response.Status.OK).entity("GetAuthorBooks").build(); 
-        } catch (NumberFormatException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("El parámetro debe ser un int").build();
-        }  
-    }*/
 }

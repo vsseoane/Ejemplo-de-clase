@@ -10,6 +10,6 @@ import javax.ejb.LocalBean;
 public class AuthorBean {
 
    public Author GetAuthor(){
-       return new Author("232","El libro de la selva");
+       return new Author("232","Juan");
    }
 }
