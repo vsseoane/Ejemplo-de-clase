@@ -1,5 +1,6 @@
 package com.ejercicio.author;
 
+import com.ejercicio.book.Book;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
@@ -13,6 +14,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import java.util.List;
 import javax.ejb.EJB;
 
 @Path("author")
@@ -34,9 +37,9 @@ public class AuthorController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAuthors() {
-        final Author author = authorBean.GetAuthor();
+        final List<Author> authors = authorBean.getAuthors();
         final Gson gson = new Gson();
-        final String JSONRepresentation = gson.toJson(author);
+        final String JSONRepresentation = gson.toJson(authors);
         return Response.status(Response.Status.OK).entity(JSONRepresentation).build();
     }
 
@@ -45,14 +48,15 @@ public class AuthorController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAuthor(@PathParam("id") String id) {
         try {
-            int authorId = Integer.parseInt(id);
-            return Response.status(Response.Status.OK).entity("GetAuthor").build(); 
+            Long authorId = Long.parseLong(id);
+            Author author = authorBean.findAuthorById(authorId);
+            return Response.status(Response.Status.OK).entity(author).build(); 
         } catch (NumberFormatException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("El parámetro debe ser un int").build();
         }
     }
     
-    @PUT
+    /*@PUT
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response putAuthor(@PathParam("id") String id) {
@@ -62,21 +66,33 @@ public class AuthorController {
         } catch (NumberFormatException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("El parámetro debe ser un int").build();
         }  
-    }
+    }*/
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postAuthor(String author) {
+    public Response postAuthor(String jsonAuthor) {
         try {
-            Gson gson = new Gson();
-           Author JSONRepresentation = gson.fromJson(author,Author.class);
-            return Response.status(Response.Status.OK).entity("PostAuthor").build(); 
+           Gson gson = new Gson();
+           Author author = gson.fromJson(jsonAuthor, Author.class);
+           Author createdAuthor = authorBean.createAuthor(author);
+            return Response.status(Response.Status.OK).entity(createdAuthor).build(); 
         } catch (NumberFormatException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("El parámetro debe ser un int").build();
         }     
     }
     
-    @DELETE
+    @POST
+    @Path("/{id}/books")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response postBook(@PathParam("id") Long id, String json) {
+        Gson dateGson = new GsonBuilder().setDateFormat("dd/MM/yyyy").create();
+        Author author = authorBean.findAuthorById(id);
+        Book book = authorBean.addBook(author, dateGson.fromJson(json, Book.class));
+        return Response.status(Response.Status.CREATED).entity(book).build();
+    }
+    
+    /*@DELETE
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteAuthor(@PathParam("id") String id) {
@@ -86,9 +102,9 @@ public class AuthorController {
         } catch (NumberFormatException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("El parámetro debe ser un int").build();
         }    
-    }
+    }*/
     
-    @GET
+    /*@GET
     @Path("{id}/book")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAuthorBooks(@PathParam("id") String id) {
@@ -98,5 +114,5 @@ public class AuthorController {
         } catch (NumberFormatException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("El parámetro debe ser un int").build();
         }  
-    }
+    }*/
 }

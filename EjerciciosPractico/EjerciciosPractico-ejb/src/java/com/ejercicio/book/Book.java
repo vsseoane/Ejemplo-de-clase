@@ -1,29 +1,55 @@
 package com.ejercicio.book;
 
 import com.ejercicio.author.Author;
+import java.io.Serializable;
+import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.validation.constraints.NotNull;
 
-public class Book {
-    public Book() {
+@Entity
+@Table(name = "book")
+public class Book implements Serializable {
     
-    }
+    private static final long serialVersionUID = 1L;
     
-    public String id;
-    public String name;
-    public Author author;
-    public int comision;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    
+    @NotNull
+    @Column(length = 8)
+    private String name;
+    
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date publicationDate;
+  
+    @ManyToOne
+    private Author author;
+    
+    @NotNull
+    @Column(length = 8)
+    private int comision;
+    
+    public Book() { }
 
-    public Book(String id, String name, Author author, int comision) {
+    public Book(Long id, String name, int comision) {
         this.id = id;
         this.name = name;
-        this.author = author;
         this.comision = comision;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -35,14 +61,6 @@ public class Book {
         this.name = name;
     }
 
-    public Author getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(Author author) {
-        this.author = author;
-    }
-
     public int getComision() {
         return comision;
     }
@@ -51,8 +69,24 @@ public class Book {
         this.comision = comision;
     }
 
+     public Date getPublicationDate() {
+        return publicationDate;
+    }
+
+    public void setPublicationDate(Date publicationDate) {
+        this.publicationDate = publicationDate;
+    }
+
+    public Author getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(Author author) {
+        this.author = author;
+    }
+    
     @Override
     public String toString() {
-        return "Book{" + "id=" + id + ", name=" + name + ", author=" + author + ", comision=" + comision + '}';
+        return "Book{" + "id=" + id + ", name=" + name + ", comision=" + comision + '}';
     }
 }

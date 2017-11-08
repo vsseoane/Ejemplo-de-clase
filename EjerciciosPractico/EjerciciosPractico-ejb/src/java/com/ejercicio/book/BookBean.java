@@ -1,6 +1,7 @@
 package com.ejercicio.book;
 
 import com.ejercicio.author.Author;
+import java.util.List;
 import javax.jms.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,11 +16,16 @@ import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.Topic;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 
 @Stateless
 @LocalBean
 public class BookBean {
+    
+    @PersistenceContext
+    private EntityManager em;
 
     @Resource(lookup = "jms/ConnectionFactory")
     private ConnectionFactory connectionFactory;
@@ -30,16 +36,22 @@ public class BookBean {
     @Resource(lookup = "jms/TopicDeliveryAndMarketing")
     private Topic topic;
     
-   public Book GetBook(){
-       return new Book("232","El libro de la selva", new Author("211", "Pedro"), 135000);
-   }
+    public List<Book> getBooks() {
+        return em.createQuery("select b from Book b").getResultList();    
+    } 
    
-   public Book createBook(Book book) {
-        FinanceDto financeBook = toFinanceDto(book);
-        DeliveryAndMarketingDto deliveryAndMarketingBook = toDeliveryAndMarketingDto(book);
-        sendFinanceNotification(financeBook);
-        sendDeliveryAndMarketingNotification(deliveryAndMarketingBook);
-        return book;
+    public Book createBook(Author author, Book book) {
+        try {
+            book.setAuthor(author);
+            FinanceDto financeBook = toFinanceDto(book);
+            DeliveryAndMarketingDto deliveryAndMarketingBook = toDeliveryAndMarketingDto(book);
+            sendFinanceNotification(financeBook);
+            sendDeliveryAndMarketingNotification(deliveryAndMarketingBook);
+            em.persist(book);
+            return book;
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
     }
   
     private void sendFinanceNotification(FinanceDto book) {
@@ -72,7 +84,6 @@ public class BookBean {
     
     private FinanceDto toFinanceDto(Book entity) {
         FinanceDto dto = new FinanceDto();
-        dto.setAuthorName(entity.getAuthor().getName());
         dto.setName(entity.getName());
         dto.setComision(entity.getComision());
         return dto;
@@ -80,7 +91,6 @@ public class BookBean {
     
     private DeliveryAndMarketingDto toDeliveryAndMarketingDto(Book entity) {
         DeliveryAndMarketingDto dto = new DeliveryAndMarketingDto();
-        dto.setAuthorName(entity.getAuthor().getName());
         dto.setName(entity.getName());
         return dto;
     }

@@ -5,28 +5,54 @@
  */
 package com.ejercicio.author;
 
+import com.ejercicio.book.Book;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
 /**
  *
  * @author Fede2
  */
-public class Author {
+@Entity
+@Table(name = "author")
+public class Author implements Serializable {
+    
+    private static final long serialVersionUID = 1L;
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    
+    @NotNull
+    @Column(length = 8)
+    private String name;
+    
+    @OneToMany(mappedBy = "author")
+    private List<Book> books;
     
     public Author(){
         
     }
-     public Author(String anId, String aName){
-        this.id = anId;
-        this.name = aName;
-        
+     public Author(Long id, String name){
+        this.id = id;
+        this.name = name;
+        this.books = new ArrayList<Book>();       
     }
-    public String id;
-    public String name;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+        public void setId(Long id) {
         this.id = id;
     }
 
@@ -38,6 +64,14 @@ public class Author {
         this.name = name;
     }
 
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
+    }
+    
     @Override
     public String toString() {
         return "Author{" + "id=" + id + ", name=" + name + '}';
